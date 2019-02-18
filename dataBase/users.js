@@ -49,15 +49,34 @@ var Login = async (ctx) => {
         }
     }
 }
-exports.Login = Login;
 //注册
-exports.Regist = function(req, res, next){
+var Regist = async (ctx) => {
+    var req = ctx.request;
     var users = new User({
-        username: req.body.username,
+        username: req.body.name,
         password: req.body.password
     });
+    var rslt = await User.find({username:users.username}).exec();
+    if(rslt&&rslt!=''&&rslt!='[]'){
+        return {
+            res_code:'0',
+            res_msg:'用户已经存在'
+        }
+    }else{
+        var newUser = await User.save().exec();
+        return {
+            res_code:'1',
+            res_msg:'注册成功',
+            data:{
+                uid:newUser._id
+            }
+        }
+    }
+
+
+
     //mongoose里model的实例(这里就是小写的users)不存在find方法，用users.find()会报错，所以用User.find()
-    User.find({username:users.username})
+    /* User.find({username:users.username})
     .then(function(data){
         if(data&&data!=''&&data!='[]'){
             res.json({
@@ -89,5 +108,8 @@ exports.Regist = function(req, res, next){
     }).catch(function(err){
         console.log('find--err');
         console.log(err);
-    })
+    }) */
 }
+exports.Login = Login;
+//注册
+exports.Regist = Regist;
