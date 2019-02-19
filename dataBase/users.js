@@ -63,7 +63,8 @@ var Regist = async (ctx) => {
             res_msg:'用户已经存在'
         }
     }else{
-        var newUser = await User.save().exec();
+        var newUser = await users.save();//注意save是model的方法，所以是users.save而不是User.save
+        console.log(newUser)
         return {
             res_code:'1',
             res_msg:'注册成功',
