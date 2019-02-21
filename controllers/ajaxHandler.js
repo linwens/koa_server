@@ -61,6 +61,6 @@ module.exports = {
     "POST /article/add" : fn_article_add,
     "POST /article/del/:id" : fn_article_del,
     "POST /article/update/:id" : fn_article_update,
-    "POST /article/get/:id" : fn_article_get,
-    "POST /article/list/:tag" : fn_article_list,
+    "GET /article/get/:id" : fn_article_get,
+    "GET /article/list/:tag" : fn_article_list,
 }

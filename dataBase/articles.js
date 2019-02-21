@@ -21,9 +21,12 @@ marked.setOptions({
 //文章发布
 var Add_article = async (ctx) => {
 	var req = ctx.request;
-	var tags = [];
-	for(var key in JSON.parse(req.body.tags)){
-	    tags.push(JSON.parse(req.body.tags)[key])
+	var tags = [];//req.body.tags得是对象，如{"tag1":"111","tag2":"2222"}
+	if(req.body.tags){
+		for(var key in JSON.parse(req.body.tags)){
+			tags.push(JSON.parse(req.body.tags)[key])
+		}
+
 	}
 	var articles = new Articles({
 	    time: Math.round(Date.parse(new Date())/1000),
