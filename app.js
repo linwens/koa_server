@@ -4,6 +4,7 @@ const app = new Koa();
 const controller = require('./controller');//路由控制
 const templating = require('./view'); //模板引擎
 const isProduction = process.env.NODE_ENV === 'production'; //当前环境的开关
+const logger = require('./logger');//引入日志中间件
 //静态资源
 if(!isProduction){ // 生产环境的静态资源由nginx处理
   let staticFiles = require('./static-files');
@@ -12,9 +13,16 @@ if(!isProduction){ // 生产环境的静态资源由nginx处理
 
 //错误处理及日志记录
 app.use(async (ctx, next) => {
+  //响应开始时间
+  const start = new Date();
+  //响应间隔时间
+  var ms;
   try{
     await next();
   }catch(err){
+    ms = new Date() - start;
+    //记录异常日志
+    logUtil.logError(ctx, error, ms);
     ctx.status = err.statusCode || err.status || 500;
     ctx.body = {
       message: err.message,
