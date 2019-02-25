@@ -10,6 +10,17 @@ if(!isProduction){ // 生产环境的静态资源由nginx处理
   app.use(staticFiles('/static/', __dirname + '/static'));
 }
 
+//错误处理及日志记录
+app.use(async (ctx, next) => {
+  try{
+    await next();
+  }catch(err){
+    ctx.status = err.statusCode || err.status || 500;
+    ctx.body = {
+      message: err.message,
+    }
+  }
+})
 //logger
 app.use(async (ctx, next) => { //这是一个中间件单元
   await next(); // 这里把控制权交给下一个中间件，等那个中间件执行完了，再回来执行后面的代码
