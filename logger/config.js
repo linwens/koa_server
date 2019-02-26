@@ -14,12 +14,6 @@ const resLogPath = path.resolve(__dirname, "../logs/response");
  */
 module.exports = {
     // 日志类型配置
-    "levels":{
-        "errLog":"ERROR",
-        "reqLog":"INFO",
-        "resLog":"INFO",
-        "info": 'ALL'
-    },
     "appenders":{
         "errLog":{
             "category": "errLog",            //logger名称
@@ -57,5 +51,11 @@ module.exports = {
         "info":{
             "type":"console"
         }
+    },
+    "levels":{
+        "errLog":"ERROR",
+        "reqLog":"INFO",
+        "resLog":"INFO",
+        "info": 'ALL'
     }
 }
