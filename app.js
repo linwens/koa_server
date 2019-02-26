@@ -26,7 +26,7 @@ app.use(async (ctx, next) => {
       //记录响应日志
       logger.resLogger(ctx, ms);
     }else{
-      logger.consoleLogger(ctx, ms);
+      logger.consoleLogger(ctx);
     }
   }catch(err){
     ms = new Date() - start;
@@ -34,7 +34,7 @@ app.use(async (ctx, next) => {
       //记录异常日志
       logger.errLogger(ctx, err, ms);
     }else{
-      logger.consoleLogger(ctx, ms);
+      logger.consoleLogger(err);
     }
     ctx.status = err.statusCode || err.status || 500;
     ctx.body = {

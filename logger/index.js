@@ -38,7 +38,7 @@ var formatError = function (ctx, err, resTime) {
     var logText = new String();
 
     //错误信息开始
-    logText += "[ERROR]";
+    logText += "";
 
     //添加请求日志
     logText += formatReq(ctx.request, resTime);
@@ -51,7 +51,7 @@ var formatError = function (ctx, err, resTime) {
     logText += "err stack: " + err.stack + "\n";
 
     //错误信息结束
-    logText += "**";
+    logText += "*******************";
 
     return logText;
 };
@@ -59,13 +59,13 @@ var formatError = function (ctx, err, resTime) {
 var formatInfo = function (info) {
     var logText = new String();
     //响应日志开始
-    logText += "[INFO]";
+    logText += "";
 
     //响应内容
-    logText += "info detail: " + "\n" + JSON.stringify(info) + "\n";
+    logText += "detail: " + "\n" + JSON.stringify(info) + "\n";
 
     //响应日志结束
-    logText += "**";
+    logText += "*********info*******";
 
     return logText;
 }
@@ -74,7 +74,7 @@ var formatInfo = function (info) {
 var formatRes = function (ctx, resTime) {
     var logText = new String();
     //响应日志开始
-    logText += "[RESPONSE]";
+    logText += "";
 
     // //添加请求日志
     // logText += formatReq(ctx.request, resTime);
@@ -86,7 +86,7 @@ var formatRes = function (ctx, resTime) {
     logText += "response body: " + "\n" + JSON.stringify(ctx.body) + "\n";
 
     //响应日志结束
-    logText += "**";
+    logText += "****************";
 
     return logText;
 
@@ -98,7 +98,7 @@ var formatReq = function (req, resTime) {
 
     var method = req.method;
     //访问方法
-    logText += "[REQUEST] request method: " + method + "\n";
+    logText += "request method: " + method + "\n";
 
     //请求原始地址
     logText += "request originalUrl:  " + req.originalUrl + "\n";

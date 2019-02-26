@@ -2,7 +2,6 @@
 var User = require('./mongoose').User;
 //登录
 var Login = async (ctx) => {
-    console.log('---====>>>')
     console.log(ctx.request.body)
     var req = ctx.request;
     var users = new User({

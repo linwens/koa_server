@@ -14,9 +14,9 @@ const resLogPath = path.resolve(__dirname, "../logs/response");
  */
 module.exports = {
     // 日志类型配置
-    "appenders":{
-        "errLog":{
-            "category": "errLog",            //logger名称
+    appenders:{
+        errLog:{
+            //"category": "errLog",            //logger名称
             "type": "dateFile",              //日志类型
             "filename": "error",             //日志输出文件名
             "alwaysInludePattern": true,     //是否总是有后缀名
@@ -26,8 +26,8 @@ module.exports = {
             "maxLogSize": 1000,
             "numBackups": 3,
         },
-        "reqLog":{
-            "category": "reqLog",
+        reqLog:{
+            //"category": "reqLog",
             "type": "dateFile",
             "filename": "request",
             "alwaysInludePattern": true,
@@ -37,8 +37,8 @@ module.exports = {
             "maxLogSize": 1000,
             "numBackups": 3,
         },
-        "resLog":{
-            "category": "resLog",
+        resLog:{
+            //"category": "resLog",
             "type": "dateFile",
             "filename": "response",
             "alwaysInludePattern": true,
@@ -48,14 +48,22 @@ module.exports = {
             "maxLogSize": 1000,
             "numBackups": 3,
         },
-        "info":{
+        info:{
             "type":"console"
         }
     },
-    "levels":{
-        "errLog":"ERROR",
-        "reqLog":"INFO",
-        "resLog":"INFO",
-        "info": 'ALL'
-    }
+    // "levels":{
+    //     "errLog":"ERROR",
+    //     "reqLog":"INFO",
+    //     "resLog":"INFO",
+    //     "info": 'ALL'
+    // },
+    //暴露给外部调用
+    categories: {
+        "default": {"appenders": ["info"], "level": "all"},
+        "info": {"appenders": ["info"], "level": "all"},
+        "resLog": {"appenders": ["resLog"], "level": "info"},
+        "errLog": {"appenders": ["errLog"], "level": "error"},
+        "reqLog": {"appenders": ["reqLog"],"level": "info"}
+    },
 }
