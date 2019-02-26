@@ -19,30 +19,43 @@ app.use(async (ctx, next) => {
   var ms;
   try{
     await next();
+    ms = new Date() - start;
+    if(isProduction){
+      //记录请求日志
+      logger.reqLogger(ctx, ms);
+      //记录响应日志
+      logger.resLogger(ctx, ms);
+    }else{
+      logger.consoleLogger(ctx, ms);
+    }
   }catch(err){
     ms = new Date() - start;
-    //记录异常日志
-    logUtil.logError(ctx, error, ms);
+    if(isProduction){
+      //记录异常日志
+      logger.errLogger(ctx, err, ms);
+    }else{
+      logger.consoleLogger(ctx, ms);
+    }
     ctx.status = err.statusCode || err.status || 500;
     ctx.body = {
       message: err.message,
     }
   }
 })
-//logger
-app.use(async (ctx, next) => { //这是一个中间件单元
-  await next(); // 这里把控制权交给下一个中间件，等那个中间件执行完了，再回来执行后面的代码
-  const rt = ctx.response.get('X-Response-Time');
-  console.log(`${ctx.method} ${ctx.url} - ${rt}`);
-});
+// //logger
+// app.use(async (ctx, next) => { //这是一个中间件单元
+//   await next(); // 这里把控制权交给下一个中间件，等那个中间件执行完了，再回来执行后面的代码
+//   const rt = ctx.response.get('X-Response-Time');
+//   console.log(`${ctx.method} ${ctx.url} - ${rt}`);
+// });
 
-//x-reponse-time
-app.use(async (ctx, next) => {
-  const start = Date.now();
-  await next();
-  const ms = Date.now() - start;
-  ctx.set('X-Response-Time', `${ms}ms`);
-});
+// //x-reponse-time
+// app.use(async (ctx, next) => {
+//   const start = Date.now();
+//   await next();
+//   const ms = Date.now() - start;
+//   ctx.set('X-Response-Time', `${ms}ms`);
+// });
 
 //koa-bodyparser必须在router之前被注册到app对象上
 app.use(bodyParser());
