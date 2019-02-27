@@ -4,7 +4,7 @@ const app = new Koa();
 const controller = require('./controller');//路由控制
 const templating = require('./view'); //模板引擎
 const isProduction = process.env.NODE_ENV === 'production'; //当前环境的开关
-const logger = require('./logger');//引入日志中间件
+const log = require('./logger');//引入日志中间件
 //静态资源
 if(!isProduction){ // 生产环境的静态资源由nginx处理
   let staticFiles = require('./static-files');
@@ -20,21 +20,19 @@ app.use(async (ctx, next) => {
   try{
     await next();
     ms = new Date() - start;
-    if(isProduction){
-      //记录请求日志
-      logger.reqLogger(ctx, ms);
-      //记录响应日志
-      logger.resLogger(ctx, ms);
+    if(!isProduction){
+      log.info('这里需要拼接字符串');
     }else{
-      logger.consoleLogger(ctx);
+      console.log('------====---');
     }
   }catch(err){
     ms = new Date() - start;
-    if(isProduction){
+    if(!isProduction){
       //记录异常日志
-      logger.errLogger(ctx, err, ms);
+      console.log(err);
+      log.error('code= %s, message= %s', err.statusCode || err.status, err.message);
     }else{
-      logger.consoleLogger(err);
+      console.log(err);
     }
     ctx.status = err.statusCode || err.status || 500;
     ctx.body = {
