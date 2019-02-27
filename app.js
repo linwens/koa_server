@@ -20,17 +20,14 @@ app.use(async (ctx, next) => {
   try{
     await next();
     ms = new Date() - start;
-    if(!isProduction){
-      log.info('这里需要拼接字符串');
-    }else{
-      console.log('------====---');
+    if(isProduction){
+      log.info(`${ctx.method} ${ctx.url} - ${rt}`);
     }
   }catch(err){
     ms = new Date() - start;
-    if(!isProduction){
+    if(isProduction){
       //记录异常日志
-      console.log(err);
-      log.error('code= %s, message= %s', err.statusCode || err.status, err.message);
+      log.error(`code= ${err.statusCode || err.status || 500}, message= ${err.message}`);
     }else{
       console.log(err);
     }
@@ -39,22 +36,7 @@ app.use(async (ctx, next) => {
       message: err.message,
     }
   }
-})
-// //logger
-// app.use(async (ctx, next) => { //这是一个中间件单元
-//   await next(); // 这里把控制权交给下一个中间件，等那个中间件执行完了，再回来执行后面的代码
-//   const rt = ctx.response.get('X-Response-Time');
-//   console.log(`${ctx.method} ${ctx.url} - ${rt}`);
-// });
-
-// //x-reponse-time
-// app.use(async (ctx, next) => {
-//   const start = Date.now();
-//   await next();
-//   const ms = Date.now() - start;
-//   ctx.set('X-Response-Time', `${ms}ms`);
-// });
-
+});
 //koa-bodyparser必须在router之前被注册到app对象上
 app.use(bodyParser());
 //给app.context绑定render方法

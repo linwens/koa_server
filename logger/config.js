@@ -15,7 +15,7 @@ module.exports = {
             "type": "dateFile",               //日志类型
             "layout": {                       // 输出日志的展示格式
                 "type": "pattern",
-                "pattern": "[%d] - [%p] %c - %m%n"
+                "pattern": "[%d{yyyy-MM-dd-hh:mm:ss}]-[%p] %c-%m%n"
             },
             "filename": logPath + "/main",             //日志输出文件名
             "alwaysInludePattern": true,     //是否总是有后缀名

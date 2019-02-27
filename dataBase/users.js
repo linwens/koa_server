@@ -2,13 +2,11 @@
 var User = require('./mongoose').User;
 //登录
 var Login = async (ctx) => {
-    console.log(ctx.request.body)
     var req = ctx.request;
     var users = new User({
         username: decodeURI(req.body.name),
         password: decodeURI(req.body.password)
     });
-    console.log(users)
     if(users.username==='guests'){
         return {
             res_code:1,
