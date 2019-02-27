@@ -66,7 +66,180 @@ var Add_article = async (ctx) => {
 		}
 	}
 }
-exports.Add_article = Add_article;
+//更新文章
+var Update_article = async (ctx) => {
+	var req = ctx.request;
+	var tags = [];//req.body.tags得是对象，如{"tag1":"111","tag2":"2222"}
+	if(req.body.tags){
+		for(var key in JSON.parse(req.body.tags)){
+			tags.push(JSON.parse(req.body.tags)[key])
+		}
+
+	}
+	let params = {
+		title: req.body.title,
+		text: req.body.text,
+		brief: req.body.brief,
+		tags:tags,
+		operate:req.body.operate
+	};
+	var rslt = await Articles.find({"$or":[{'time':req.query.time}, {'aid':req.query.aid}]});
+	if(rslt&&rslt!=''){
+		var flag = await Articles.update({aid:req.body.aid}, params)
+		if(flag){
+			if(req.body.operate==='save'){
+				return {
+						res_code:1,
+						res_msg:'文章修改成功未发布'
+				}
+			}else{
+				return {
+						res_code:1,
+						res_msg:'文章修改成功并发布'
+				}
+			}
+		}else{
+			return {
+				res_code:4,
+				res_msg:'文章更新失败'
+			}
+		}
+	}else{
+		return {
+			res_code:2,
+			res_msg:'文章不存在'
+		}
+	}
+}
+//删除文章
+var Del_article = async (ctx) => {
+	var req = ctx.request;
+	var rslt = await Articles.remove({aid:req.body.aid});
+
+	if(rslt&&rslt!=''){
+		return {
+				res_code:1,
+				res_msg:'文章删除成功'
+		}
+	}else{
+		return {
+			res_code:2,
+			res_msg:'文章不存在'
+		}
+	}
+}
+//获取文章
+var Get_article = async (ctx, next) => {
+	var req = ctx.request;
+	var rslt = await Articles.find({"$or":[{'time':req.query.time}, {'aid':req.query.aid}]});
+
+	if(rslt&&rslt!=''){
+		//rslt[0].text代表第一条，所以是针对具体id查询一篇文章
+		var artText = rslt[0].text?rslt[0].text:'获取文章了，但是没有正文';
+		if(!(req.query.option&&req.query.option=='modify')){//文章修改返回原markdown
+			artText = marked(artText)
+		}
+		return {
+				res_code:1,
+				articleDetail:{
+						title:rslt[0].title,
+						time:rslt[0].time,
+						tags:rslt[0].tags.length>0?rslt[0].tags:null,
+						text:artText,
+						brief:rslt[0].brief,
+						pv:rslt[0].pv+1
+				}
+		}
+		//更新阅读量---请修改！！！！！！！！！！！！！！！！！！！！！！
+		try{
+			await Articles.update({aid:req.query.aid}, {$inc:{pv:1}})
+		}catch(err){
+			await next();
+		}
+	}else{
+		return {
+			res_code:2,
+			res_msg:'文章不存在'
+		}
+	}
+}
+//获取文章列表
+var Article_list = async (ctx) => {
+	var req = ctx.request;
+	var schWord = req.query.schWord?req.query.schWord:null,
+		curPage = req.query.curPage?parseInt(req.query.curPage):1,
+		pageSize = req.query.pageSize?parseInt(req.query.pageSize):5,
+		from = req.query.from?req.query.from:null,
+		findParams = {};//筛选
+	if(from!=='front'){//前台网站展示文章只展示发布的
+		if(schWord){//标题，正文，标签内包含关键字(js的RegExp对象)
+			var schRegExp = new RegExp(schWord,"i");
+			findParams = {"$or":[{'title':schRegExp}, {'text':schRegExp}, {'brief':schRegExp}, {'tags':schRegExp}]};
+		}
+	}else{
+		findParams = {operate:'publish'};
+		if(schWord){//标题，正文，标签内包含关键字(js的RegExp对象)
+			var schRegExp = new RegExp(schWord,"i");
+			findParams = {"$or":[{'title':schRegExp}, {'text':schRegExp}, {'brief':schRegExp}, {'tags':schRegExp}], operate:'publish'};
+		}
+	}
+	try{
+		var total = await Articles.count(findParams);
+	}catch(err){
+		console.log(err);
+		return {
+			res_code:4,
+			res_msg:'获取文章列表总条数出错'
+		}
+	}
+	try{
+		var rslt = await Articles.find(findParams).skip((curPage-1)*pageSize).limit(pageSize).sort({time:-1});
+	}catch(err){
+		console.log(err);
+		return {
+			res_code:4,
+			res_msg:'文章列表数据出错'
+		}
+	}
+	
+	if(rslt&&rslt!=''){
+		let rsltList = [];
+		for(let i = 0;i<rslt.length;i++){
+			let obj = {}
+			obj.time = rslt[i].time;
+			obj.aid = rslt[i].aid;
+			obj.brief = rslt[i].brief?rslt[i].brief:'';
+			obj.title = rslt[i].title;
+			obj.tags = rslt[i].tags;
+			obj.operate = rslt[i].operate;
+			rsltList.push(obj);
+		}
+		return {
+				res_code:1,
+				dataList:rsltList,
+				page:curPage,
+				page_size:pageSize,
+				total:total
+		}
+	}else{
+		return {
+			res_code:2,
+			dataList:[],
+				page:curPage,
+				page_size:pageSize,
+				total:total,
+			res_msg:'暂无相关文章'
+		}
+	}
+}
+//exports.Add_article = Add_article;
+module.exports = {
+	Add_article: Add_article,
+	Update_article: Update_article,
+	Del_article: Del_article,
+	Get_article: Get_article,
+	Article_list: Article_list,
+}
 /* exports.Subarticle = function(req, res, next){
 	var tags = [];//针对vue本地调试，改为body=>query
 	for(var key in JSON.parse(req.body.tags)){
