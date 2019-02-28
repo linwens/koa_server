@@ -1,12 +1,15 @@
 //import {User} from './mongoose'
 var User = require('./mongoose').User;
+var ApiErr = require('../ApiErr');
 //登录
 var Login = async (ctx) => {
     var req = ctx.request;
+    console.log(req.body)
     var users = new User({
         username: decodeURI(req.body.name),
         password: decodeURI(req.body.password)
     });
+    console.log(users)
     if(users.username==='guests'){
         return {
             res_code:1,
@@ -17,7 +20,6 @@ var Login = async (ctx) => {
         }
     }else{
         var rslt = await User.find({username:users.username}).exec();
-        console.log(rslt)
         if(rslt&&rslt!=''){
             if(rslt[0].password == users.password){//验证密码
                 //设置cookie

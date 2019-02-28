@@ -33,7 +33,9 @@ app.use(async (ctx, next) => {
     }
     ctx.status = err.statusCode || err.status || 500;
     ctx.body = {
-      message: err.message,
+      name: err.name,
+      code: err.code || err.statusCode || err.status || 500,
+      message: err.msg,
     }
   }
 });
