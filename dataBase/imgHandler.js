@@ -1,8 +1,8 @@
-import {Img} from './mongoose';
-import multer from 'multer';
-import qiniu from 'qiniu';
-import uuid from 'node-uuid';
 
+const Img = require('./mongoose').Img;
+const multer = require('koa-multer');
+const qiniu = require('qiniu');
+const uuid = require('node-uuid');
 
 //multer配置
 //存为buffer
@@ -19,7 +19,67 @@ var multerConf = multer({
     }
 }).single('imgFiles');
 //图片上传
-exports.ImgUpload = function(req, res, next){
+var Add_img = async (ctx) => {
+    var req = ctx.request;
+    var res = ctx.response;
+    try{
+        var doMulter =await multerConf(req, res)
+    }catch(e){
+        throw new Error();
+    }
+    console.log(doMulter)
+    //七牛配置---生成token
+    var accessKey = 'Y_k8Ymui6QCIKcg_dENCZR3TGgZ_aP65jwnj3KCU';
+    var secretKey = 'oWRin6KjO5dD1SGmjT9jIRaBG0d02lX5AdFwWpqn';
+    //var bucket = 'linwens-img';
+    var bucket = req.body.bucketType === 'galleryImg'?'linwens-img':'blog-img';//配置上传不同传出空间
+    var mac = new qiniu.auth.digest.Mac(accessKey, secretKey);
+    var options = {
+        scope: bucket,
+        returnBody: '{"key":"$(key)","hash":"$(etag)","width":"$(imageInfo.width)","height":"$(imageInfo.height)","model":"$(exif.Model.val)","iso":"$(exif.ISOSpeedRatings.val)","shutter":"$(exif.ExposureTime.val)","aperture":"$(exif.FNumber.val)","Flength":"$(exif.FocalLength.val)"}'
+    };
+    var putPolicy = new qiniu.rs.PutPolicy(options);
+    var uploadToken=putPolicy.uploadToken(mac);
+    //----找到七牛机房
+    var config = new qiniu.conf.Config();
+    config.zone = qiniu.zone.Zone_z0;
+
+    var formUploader = new qiniu.form_up.FormUploader(config);
+    var putExtra = new qiniu.form_up.PutExtra();
+    var key = req.file.originalname;
+
+    if(req.file&&req.file.buffer){
+        try{
+            var respInfo = formUploader.put(uploadToken, key, req.file.buffer, putExtra);
+        }catch(e){
+            throw respInfo.respErr;
+        }
+        
+        if (respInfo.statusCode == 200) {
+            var exifObj = {};
+                exifObj.model = respBody.model;
+                exifObj.iso = respBody.iso;
+                exifObj.shutter = respBody.shutter;
+                exifObj.aperture = respBody.aperture;
+                exifObj.Flength = respBody.Flength;
+            return {
+                res_code:'0',
+                res_msg:'上传成功',
+                size:respBody.width+'x'+respBody.height,
+                exif:exifObj,
+                backUrl:(bucket==='linwens-img'?'http://osurqoqxj.bkt.clouddn.com/':'http://otvt0q8hg.bkt.clouddn.com/')+respBody.key
+            }
+        } else {
+            console.log(respInfo.statusCode);
+            console.log(respBody);
+            throw new Error('七牛返回不正常')
+        }
+    }
+}
+module.exports = {
+    Add_img:Add_img
+}
+/* exports.ImgUpload = function(req, res, next){
     //传七牛
     multerConf(req, res, function(err){
         //req.body.bucketType
@@ -82,7 +142,7 @@ exports.ImgUpload = function(req, res, next){
             }
         }
     }) 
-};
+}; */
 //图片信息存入数据库
 exports.ImgInfosave = function(req, res, next){
     var img = new Img({

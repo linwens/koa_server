@@ -8,6 +8,8 @@ var Update_article = require('../dataBase/articles').Update_article;
 var Del_article = require('../dataBase/articles').Del_article;
 var Get_article = require('../dataBase/articles').Get_article;
 var Article_list = require('../dataBase/articles').Article_list;
+//---------------------------图片相关
+var Add_img = require('../dataBase/imgHandler').Add_img;
 //注册接口
 var fn_signup = async (ctx, next) => {
     var name = ctx.request.body.name || '',
@@ -67,6 +69,13 @@ var fn_article_list = async (ctx, next) => {
     console.log(status);
     ctx.response.body = status;
 }
+//图片相关接口--------------------------------------------
+//图片上传
+var fn_add_img = async (ctx, next) => {
+    var status = await Add_img(ctx)
+    console.log(status);
+    ctx.response.body = status;
+}
 module.exports = {
     "POST /signin" : fn_signin,
     "POST /signup" : fn_signup,
@@ -75,4 +84,5 @@ module.exports = {
     "POST /article/update/:id" : fn_article_update,
     "GET /article/get/:id" : fn_article_get,
     "GET /article/list/:tag" : fn_article_list,
+    "POST /img/add"  : fn_add_img,
 }
