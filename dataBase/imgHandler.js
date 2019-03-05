@@ -25,9 +25,13 @@ var Add_img = async (ctx) => {
     try{
         var doMulter =await multerConf(req, res)
     }catch(e){
+        console.log('doMulter----err')
         throw new Error();
     }
+    console.log('doMulter----ok')
     console.log(doMulter)
+    console.log('req-------------------')
+    console.log(req)
     //七牛配置---生成token
     var accessKey = 'Y_k8Ymui6QCIKcg_dENCZR3TGgZ_aP65jwnj3KCU';
     var secretKey = 'oWRin6KjO5dD1SGmjT9jIRaBG0d02lX5AdFwWpqn';
@@ -70,6 +74,7 @@ var Add_img = async (ctx) => {
                 backUrl:(bucket==='linwens-img'?'http://osurqoqxj.bkt.clouddn.com/':'http://otvt0q8hg.bkt.clouddn.com/')+respBody.key
             }
         } else {
+            console.log('=============================');
             console.log(respInfo.statusCode);
             console.log(respBody);
             throw new Error('七牛返回不正常')

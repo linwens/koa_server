@@ -29,6 +29,7 @@ app.use(async (ctx, next) => {
       //记录异常日志
       log.error(`code= ${err.statusCode || err.status || 500}, message= ${err.message}`);
     }else{
+      console.log('-------------------------------')
       console.log(err);
     }
     ctx.status = err.statusCode || err.status || 500;
