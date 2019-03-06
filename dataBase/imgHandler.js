@@ -23,7 +23,11 @@ var Add_img = async (ctx) => {
     var req = ctx.request;
     var res = ctx.response;
     try{
-        var doMulter =await multerConf(req, res)
+        var doMulter =await multerConf(req, res, (err)=>{
+            if(err){
+                throw new Error('multer出错')
+            }
+        })
     }catch(e){
         console.log('doMulter----err')
         throw new Error();
