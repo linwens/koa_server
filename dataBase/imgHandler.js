@@ -25,12 +25,13 @@ var Add_img = async (ctx) => {
     try{
         var doMulter =await multerConf(req, res, (err)=>{
             if(err){
-                throw new Error('multer出错')
+                //throw new Error('multer出错')；
+                return Promise.reject(err)
             }
         })
     }catch(e){
         console.log('doMulter----err')
-        throw new Error();
+        throw Error(e);
     }
     console.log('doMulter----ok')
     console.log(doMulter)
