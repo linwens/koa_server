@@ -21,26 +21,13 @@ var multerConf = multer({
 //图片上传
 var Add_img = async (ctx) => {
     let req,res;
-    try{
-        // var doMulter =await multerConf(req, res, (err)=>{
-        //     if(err){
-        //         //throw new Error('multer出错')；
-        //         return Promise.reject(err)
-        //     }
-        // })
-        await multerConf(ctx).then(rslt=>{
-            console.log(ctx);
-            console.log('=+++====================================');
-            req = ctx.req;
-            res = ctx.res
-            return ctx.req
-        })
-    }catch(e){
-        console.log('doMulter----err')
-        throw Error(e);
-    }
-    console.log('req-------------------')
-    console.log(req)
+    await multerConf(ctx).then(rslt=>{
+        req = ctx.req;
+        res = ctx.res
+        return ctx.req
+    }).catch(err=>{
+        throw Error('multer出错');
+    })
     //七牛配置---生成token
     var accessKey = 'Y_k8Ymui6QCIKcg_dENCZR3TGgZ_aP65jwnj3KCU';
     var secretKey = 'oWRin6KjO5dD1SGmjT9jIRaBG0d02lX5AdFwWpqn';
@@ -62,33 +49,31 @@ var Add_img = async (ctx) => {
     var key = req.file.originalname;
 
     if(req.file&&req.file.buffer){
-        try{
-            var respInfo = formUploader.put(uploadToken, key, req.file.buffer, putExtra);
-        }catch(e){
-            throw respInfo.respErr;
-        }
-        console.log('respInfo====')
-        console.log(respInfo)
-        if (respInfo.statusCode == 200) {
-            var exifObj = {};
-                exifObj.model = respBody.model;
-                exifObj.iso = respBody.iso;
-                exifObj.shutter = respBody.shutter;
-                exifObj.aperture = respBody.aperture;
-                exifObj.Flength = respBody.Flength;
-            return {
-                res_code:'0',
-                res_msg:'上传成功',
-                size:respBody.width+'x'+respBody.height,
-                exif:exifObj,
-                backUrl:(bucket==='linwens-img'?'http://osurqoqxj.bkt.clouddn.com/':'http://otvt0q8hg.bkt.clouddn.com/')+respBody.key
-            }
-        } else {
-            console.log('=============================');
-            console.log(respInfo.statusCode);
-            console.log(respBody);
-            throw new Error('七牛返回不正常')
-        }
+        return new Promise((resolve, reject)=>{ // 用promise封装，才能被上层接收
+            formUploader.put(uploadToken, key, req.file.buffer, putExtra, (respErr, respBody, respInfo)=>{
+                if (respInfo.statusCode == 200) {
+                    var exifObj = {};
+                        exifObj.model = respBody.model;
+                        exifObj.iso = respBody.iso;
+                        exifObj.shutter = respBody.shutter;
+                        exifObj.aperture = respBody.aperture;
+                        exifObj.Flength = respBody.Flength;
+                    resolve({
+                        res_code:'0',
+                        res_msg:'上传成功',
+                        size:respBody.width+'x'+respBody.height,
+                        exif:exifObj,
+                        backUrl:(bucket==='linwens-img'?'http://osurqoqxj.bkt.clouddn.com/':'http://otvt0q8hg.bkt.clouddn.com/')+respBody.key
+                    })
+                } else {
+                    console.log('=============================');
+                    console.log(respInfo.statusCode);
+                    console.log(respBody);
+                    throw new Error('七牛返回不正常')
+                }
+            })
+        })
+        
     }
 }
 module.exports = {

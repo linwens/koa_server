@@ -66,7 +66,6 @@ var fn_article_get = async (ctx, next) => {
 // 获取列表
 var fn_article_list = async (ctx, next) => {
     var status = await Article_list(ctx)
-    console.log('----===-------')
     console.log(status);
     ctx.response.body = status;
 }
@@ -74,6 +73,7 @@ var fn_article_list = async (ctx, next) => {
 //图片上传
 var fn_add_img = async (ctx, next) => {
     var status = await Add_img(ctx)
+    console.log('----fn_add_img===-------')
     console.log(status);
     ctx.response.body = status;
 }
