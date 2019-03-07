@@ -20,21 +20,25 @@ var multerConf = multer({
 }).single('imgFiles');
 //图片上传
 var Add_img = async (ctx) => {
-    var req = ctx.request;
-    var res = ctx.response;
+    let req,res;
     try{
-        var doMulter =await multerConf(req, res, (err)=>{
-            if(err){
-                //throw new Error('multer出错')；
-                return Promise.reject(err)
-            }
+        // var doMulter =await multerConf(req, res, (err)=>{
+        //     if(err){
+        //         //throw new Error('multer出错')；
+        //         return Promise.reject(err)
+        //     }
+        // })
+        await multerConf(ctx).then(rslt=>{
+            console.log(ctx);
+            console.log('=+++====================================');
+            req = ctx.req;
+            res = ctx.res
+            return ctx.req
         })
     }catch(e){
         console.log('doMulter----err')
         throw Error(e);
     }
-    console.log('doMulter----ok')
-    console.log(doMulter)
     console.log('req-------------------')
     console.log(req)
     //七牛配置---生成token
@@ -63,7 +67,8 @@ var Add_img = async (ctx) => {
         }catch(e){
             throw respInfo.respErr;
         }
-        
+        console.log('respInfo====')
+        console.log(respInfo)
         if (respInfo.statusCode == 200) {
             var exifObj = {};
                 exifObj.model = respBody.model;
