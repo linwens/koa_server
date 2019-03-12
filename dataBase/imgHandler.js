@@ -76,73 +76,35 @@ var Add_img = async (ctx) => {
         
     }
 }
-module.exports = {
-    Add_img:Add_img
+//图片信息存入数据库
+var Save_img_info = async (ctx) => {
+
 }
-/* exports.ImgUpload = function(req, res, next){
-    //传七牛
-    multerConf(req, res, function(err){
-        //req.body.bucketType
-        //七牛配置---生成token
-        var accessKey = 'Y_k8Ymui6QCIKcg_dENCZR3TGgZ_aP65jwnj3KCU';
-        var secretKey = 'oWRin6KjO5dD1SGmjT9jIRaBG0d02lX5AdFwWpqn';
-        //var bucket = 'linwens-img';
-        var bucket = req.body.bucketType === 'galleryImg'?'linwens-img':'blog-img';//配置上传不同传出空间
-        var mac = new qiniu.auth.digest.Mac(accessKey, secretKey);
-        var options = {
-            scope: bucket,
-            returnBody: '{"key":"$(key)","hash":"$(etag)","width":"$(imageInfo.width)","height":"$(imageInfo.height)","model":"$(exif.Model.val)","iso":"$(exif.ISOSpeedRatings.val)","shutter":"$(exif.ExposureTime.val)","aperture":"$(exif.FNumber.val)","Flength":"$(exif.FocalLength.val)"}'
-        };
-        var putPolicy = new qiniu.rs.PutPolicy(options);
-        var uploadToken=putPolicy.uploadToken(mac);
-        //----找到七牛机房
-        var config = new qiniu.conf.Config();
-        config.zone = qiniu.zone.Zone_z0;
+//获取图片列表(需要做缓存处理)
+var Get_img_list = async (ctx) => {
 
-        var formUploader = new qiniu.form_up.FormUploader(config);
-        var putExtra = new qiniu.form_up.PutExtra();
-        var key = req.file.originalname;
+}
+//图片删除
+var Del_img = async (ctx) => {
 
-        if(err){
-            console.log(err);
-        }else{
-            if(req.file&&req.file.buffer){
-                formUploader.put(uploadToken, key, req.file.buffer, putExtra, function(respErr,
-                  respBody, respInfo) {
-                    if (respErr) {
-                        throw respErr;
-                    }
-                    if (respInfo.statusCode == 200) {
-                        var exifObj = {};
-                            exifObj.model = respBody.model;
-                            exifObj.iso = respBody.iso;
-                            exifObj.shutter = respBody.shutter;
-                            exifObj.aperture = respBody.aperture;
-                            exifObj.Flength = respBody.Flength;
-                        //{ hash: 'FvGzDnfjqLmcB6AF2EV1hhQvzcrd', key: 'cogis.jpg' }
-                        // res.json({//返回前端外链地址，前端再提交放入数据库
-                        //     res_code:'0',
-                        //     res_msg:'上传成功',
-                        //     size:respBody.width+'x'+respBody.height,
-                        //     exif:exifObj,
-                        //     backUrl:(bucket==='linwens-img'?'http://osurqoqxj.bkt.clouddn.com/':'http://otvt0q8hg.bkt.clouddn.com/')+respBody.key
-                        // })
-                        res.send(JSON.stringify({//返回前端外链地址，前端再提交放入数据库
-                            res_code:'0',
-                            res_msg:'上传成功',
-                            size:respBody.width+'x'+respBody.height,
-                            exif:exifObj,
-                            backUrl:(bucket==='linwens-img'?'http://osurqoqxj.bkt.clouddn.com/':'http://otvt0q8hg.bkt.clouddn.com/')+respBody.key
-                        }))
-                    } else {
-                        console.log(respInfo.statusCode);
-                        console.log(respBody);
-                    }
-                });
-            }
-        }
-    }) 
-}; */
+}
+//图片详情获取
+var Img_detail = async (ctx) => {
+    let req = ctx.req;
+    try{
+        var rslt = await Img.find({gid:req.query.gid}).exec()
+    }catch(err){
+        throw Error('查询图片出错')
+    }
+
+}
+module.exports = {
+    Add_img: Add_img,
+    Save_img_info: Save_img_info,
+    Get_img_list: Get_img_list,
+    Del_img: Del_img,
+    Img_detail: Img_detail,
+}
 //图片信息存入数据库
 exports.ImgInfosave = function(req, res, next){
     var img = new Img({

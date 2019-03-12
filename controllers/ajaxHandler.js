@@ -73,8 +73,26 @@ var fn_article_list = async (ctx, next) => {
 //图片上传
 var fn_add_img = async (ctx, next) => {
     var status = await Add_img(ctx)
-    console.log('----fn_add_img===-------')
-    console.log(status);
+    ctx.response.body = status;
+}
+//图片上传
+var fn_add_img = async (ctx, next) => {
+    var status = await Add_img(ctx)
+    ctx.response.body = status;
+}
+//图片上传
+var fn_add_img = async (ctx, next) => {
+    var status = await Add_img(ctx)
+    ctx.response.body = status;
+}
+//图片上传
+var fn_add_img = async (ctx, next) => {
+    var status = await Add_img(ctx)
+    ctx.response.body = status;
+}
+//图片上传
+var fn_add_img = async (ctx, next) => {
+    var status = await Add_img(ctx)
     ctx.response.body = status;
 }
 module.exports = {

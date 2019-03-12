@@ -83,7 +83,7 @@ var Update_article = async (ctx) => {
 		tags:tags,
 		operate:req.body.operate
 	};
-	var rslt = await Articles.find({"$or":[{'time':req.query.time}, {'aid':req.query.aid}]});
+	var rslt = await Articles.find({"$or":[{'time':req.query.time}, {'aid':req.query.aid}]}).exec();
 	if(rslt&&rslt!=''){
 		var flag = await Articles.update({aid:req.body.aid}, params)
 		if(flag){
@@ -131,7 +131,7 @@ var Del_article = async (ctx) => {
 //获取文章
 var Get_article = async (ctx, next) => {
 	var req = ctx.request;
-	var rslt = await Articles.find({"$or":[{'time':req.query.time}, {'aid':req.query.aid}]});
+	var rslt = await Articles.find({"$or":[{'time':req.query.time}, {'aid':req.query.aid}]}).exec();
 
 	if(rslt&&rslt!=''){
 		//rslt[0].text代表第一条，所以是针对具体id查询一篇文章
@@ -193,7 +193,7 @@ var Article_list = async (ctx) => {
 		}
 	}
 	try{
-		var rslt = await Articles.find(findParams).skip((curPage-1)*pageSize).limit(pageSize).sort({time:-1});
+		var rslt = await Articles.find(findParams).skip((curPage-1)*pageSize).limit(pageSize).sort({time:-1}).exec();
 	}catch(err){
 		console.log(err);
 		return {
