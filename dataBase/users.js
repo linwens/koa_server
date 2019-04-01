@@ -1,6 +1,8 @@
 //import {User} from './mongoose'
-var User = require('./mongoose').User;
-var ApiErr = require('../ApiErr');
+const User = require('./mongoose').User;
+const ApiErr = require('../ApiErr');
+const jsonwebtoken = require('jsonwebtoken');
+const secret = 'xx-audit'
 //登录
 var Login = async (ctx) => {
     var req = ctx.request;
@@ -31,7 +33,11 @@ var Login = async (ctx) => {
                     res_code:1,
                     res_msg:'登录成功',
                     rslt:{
-                        uid:rslt[0]._id
+                        uid:rslt[0]._id,
+                        token:jsonwebtoken.sign({
+                            exp: Math.floor(Date.now() / 1000) + (60 * 60),
+                            data: rslt[0]._id
+                        },secret)
                     }
                 }
             }else{

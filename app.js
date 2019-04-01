@@ -1,6 +1,11 @@
 const Koa = require('koa');
 const bodyParser = require('koa-bodyparser'); //解析post请求
 const app = new Koa();
+const jwt = require('jsonwebtoken');
+const secret = 'xx-audit';
+const authRules = {
+    '/login': false, // false表示当前页面不需要登陆
+}
 const controller = require('./controller');//路由控制
 const templating = require('./view'); //模板引擎
 const isProduction = process.env.NODE_ENV === 'production'; //当前环境的开关
@@ -11,6 +16,38 @@ if(!isProduction){ // 生产环境的静态资源由nginx处理
   app.use(staticFiles('/static/', __dirname + '/static'));
 }
 
+//如果需要权限就返回提示请登录
+app.use(async (ctx, next) => {
+  let req = ctx.req;
+  let url = req.url;
+  if(authRules[url]){ //需要登陆
+    let token = req.headers.authorization || req.headers['auth-token'];
+    if(!token){
+      ctx.body = {
+        name: 'auth error',
+        code: 401,
+        message: '没有token',
+      }
+    }else{
+      try{
+        await jwt.verify(token, secret);
+      }catch(err){
+        ctx.body = {
+          name: 'auth error',
+          code: 401,
+          message: '没有token',
+        }
+      }
+      await next();
+    }
+  }else{
+    await next();
+  }
+})
+function needLogin(router, item){
+  
+  
+}
 //错误处理及日志记录
 app.use(async (ctx, next) => {
   //响应开始时间
