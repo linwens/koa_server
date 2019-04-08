@@ -4,6 +4,12 @@ var Login = require('../dataBase/users').Login;
 var Regist = require('../dataBase/users').Regist;
 //---------------------------文章相关
 var Add_article = require('../dataBase/articles').Add_article;
+var Update_article = require('../dataBase/articles').Update_article;
+var Del_article = require('../dataBase/articles').Del_article;
+var Get_article = require('../dataBase/articles').Get_article;
+var Article_list = require('../dataBase/articles').Article_list;
+//---------------------------图片相关
+var Add_img = require('../dataBase/imgHandler').Add_img;
 //注册接口
 var fn_signup = async (ctx, next) => {
     var name = ctx.request.body.name || '',
@@ -41,19 +47,53 @@ var fn_article_add = async (ctx, next) => {
 }
 // 删除
 var fn_article_del = async (ctx, next) => {
-    let id = ctx.params.id;
+    var status = await Del_article(ctx)
+    console.log(status);
+    ctx.response.body = status;
 }
 // 更新
 var fn_article_update = async (ctx, next) => {
-    let id = ctx.params.id;
+    var status = await Update_article(ctx)
+    console.log(status);
+    ctx.response.body = status;
 }
 // 获取详情
 var fn_article_get = async (ctx, next) => {
-    let id = ctx.params.id;
+    var status = await Get_article(ctx)
+    console.log(status);
+    ctx.response.body = status;
 }
 // 获取列表
 var fn_article_list = async (ctx, next) => {
-    let tag = ctx.params.tag;
+    var status = await Article_list(ctx)
+    console.log(status);
+    ctx.response.body = status;
+}
+//图片相关接口--------------------------------------------
+//图片上传
+var fn_add_img = async (ctx, next) => {
+    var status = await Add_img(ctx)
+    ctx.response.body = status;
+}
+//图片上传
+var fn_add_img = async (ctx, next) => {
+    var status = await Add_img(ctx)
+    ctx.response.body = status;
+}
+//图片上传
+var fn_add_img = async (ctx, next) => {
+    var status = await Add_img(ctx)
+    ctx.response.body = status;
+}
+//图片上传
+var fn_add_img = async (ctx, next) => {
+    var status = await Add_img(ctx)
+    ctx.response.body = status;
+}
+//图片上传
+var fn_add_img = async (ctx, next) => {
+    var status = await Add_img(ctx)
+    ctx.response.body = status;
 }
 module.exports = {
     "POST /signin" : fn_signin,
@@ -63,4 +103,5 @@ module.exports = {
     "POST /article/update/:id" : fn_article_update,
     "GET /article/get/:id" : fn_article_get,
     "GET /article/list/:tag" : fn_article_list,
+    "POST /img/add"  : fn_add_img,
 }

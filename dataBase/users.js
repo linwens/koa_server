@@ -1,10 +1,12 @@
 //import {User} from './mongoose'
-var User = require('./mongoose').User;
+const User = require('./mongoose').User;
+const ApiErr = require('../ApiErr');
+const jsonwebtoken = require('jsonwebtoken');
+const secret = 'xx-audit'
 //登录
 var Login = async (ctx) => {
-    console.log('---====>>>')
-    console.log(ctx.request.body)
     var req = ctx.request;
+    console.log(req.body)
     var users = new User({
         username: decodeURI(req.body.name),
         password: decodeURI(req.body.password)
@@ -20,7 +22,6 @@ var Login = async (ctx) => {
         }
     }else{
         var rslt = await User.find({username:users.username}).exec();
-        console.log(rslt)
         if(rslt&&rslt!=''){
             if(rslt[0].password == users.password){//验证密码
                 //设置cookie
@@ -32,7 +33,11 @@ var Login = async (ctx) => {
                     res_code:1,
                     res_msg:'登录成功',
                     rslt:{
-                        uid:rslt[0]._id
+                        uid:rslt[0]._id,
+                        token:jsonwebtoken.sign({
+                            exp: Math.floor(Date.now() / 1000) + (60 * 60),
+                            data: rslt[0]._id
+                        },secret)
                     }
                 }
             }else{

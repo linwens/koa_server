@@ -11,3 +11,44 @@
     <p>Password: <input name="password" type="password"></p>
     <p><input type="submit" value="Submit"></p>
 </form>
+<h2>图片上传</h2>
+<form action="/img/add" method="post" enctype="multipart/form-data">
+    <input type="file" name="imgFiles" />
+    <input type="submit" value="提交"/>
+  </form>
+<div>
+    <input id="btn1" type="file" name="imgFiles"/>  
+    <input id="btn2" type="submit" value="提交"/>
+</div>
+<script>
+    
+    var btn1 = document.querySelector('#btn1')
+    var btn2 = document.querySelector('#btn2')
+    var file = null
+    btn1.addEventListener('change', function(e){
+        file = e.target.files[0]
+    })
+
+    btn2.onclick = function(){
+        var _data = new FormData();
+        _data.append('imgFiles', file);
+        xhr(_data)
+    }
+
+    var xhr = function(formdata){
+        var xmlHttp = new XMLHttpRequest();  
+
+        xmlHttp.open("post","http://localhost:3000/img/add", true);  
+         
+        xmlHttp.send(formdata);
+
+        xmlHttp.onreadystatechange = function(){  
+          if(xmlHttp.readyState==4){  
+              if(xmlHttp.status==200){  
+                  var data = xmlHttp.responseText;  
+                  console.log(data);  
+              }  
+          }
+        }
+    }
+</script>
